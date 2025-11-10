@@ -17,32 +17,25 @@ public class ExperimentRunner {
         double capacidade = Config.PESO_MAXIMO;
 
         // 1. SOLUÇÃO INICIAL
-        System.out.println("\n🎯 SOLUÇÃO ENCONTRADA:");
+        System.out.println("\n SOLUÇÃO ENCONTRADA:");
         GA ga = new GA(Config.N_CROMOSSOMOS, Config.TAXA_CROSSOVER, Config.TAXA_MUTACAO,
                 Config.ELITISMO, Config.GERACOES, 0.001);
         Chromosome melhorSolucao = ga.run(items, capacidade);
         System.out.println(melhorSolucao);
 
         // 2. ESTATÍSTICAS
-        System.out.println("\n📊 ESTATÍSTICAS (" + Config.NUM_EXECUCOES + " execuções):");
-        List<Experiment.ExperimentResult> resultados = Experiment.executeRuns(items, capacidade);
+        System.out.println("\n ESTATÍSTICAS (" + Config.NUM_EXECUCOES + " execuções):");
+        List<Experiment.ExperimentResult> resultados = Experiment.executeRuns(items,
+                capacidade);
         showStatistics(resultados);
 
-        // 3. METODOLOGIA
-        System.out.println("\n🧬 METODOLOGIA DO ALGORITMO:");
-        showMethodology();
-
         // 4. CAPACIDADES
-        System.out.println("\n📦 COMPORTAMENTO COM DIFERENTES CAPACIDADES:");
+        System.out.println("\n COMPORTAMENTO COM DIFERENTES CAPACIDADES:");
         testCapacities(items, capacidade);
 
         // 5. CONJUNTOS DE ITENS
-        System.out.println("\n🎒 COMPORTAMENTO COM DIFERENTES CONJUNTOS:");
+        System.out.println("\n COMPORTAMENTO COM DIFERENTES CONJUNTOS:");
         testItemSets(capacidade);
-
-        // 6. RESUMO
-        System.out.println("\n💡 RESUMO DA ANÁLISE:");
-        showSummary();
 
         return ga;
     }
@@ -63,12 +56,14 @@ public class ExperimentRunner {
     /**
      * Mostra estatísticas dos resultados
      */
-    private static void showStatistics(List<Experiment.ExperimentResult> resultados) {
+    private static void showStatistics(List<Experiment.ExperimentResult> resultados)
+    {
         double[] fitnessValues = new double[resultados.size()];
         for (int i = 0; i < resultados.size(); i++) {
             fitnessValues[i] = resultados.get(i).bestFitness;
         }
-        Experiment.StatisticalSummary stats = new Experiment.StatisticalSummary(fitnessValues);
+        Experiment.StatisticalSummary stats = new Experiment.StatisticalSummary
+                (fitnessValues);
 
         double tempoMedio = resultados.stream()
                 .mapToDouble(r -> r.executionTimeMs)
@@ -84,24 +79,10 @@ public class ExperimentRunner {
     }
 
     /**
-     * Mostra metodologia do algoritmo
-     */
-    private static void showMethodology() {
-        System.out.printf("""
-            • Seleção: Torneio (tamanho 3)
-            • Cruzamento: Ponto único (%.0f%%)
-            • Mutação: Bit flip (%.0f%%)
-            • Elitismo: %d melhores preservados
-            • População: %d indivíduos
-            • Gerações: %d
-            """, Config.TAXA_CROSSOVER * 100, Config.TAXA_MUTACAO * 100,
-                Config.ELITISMO, Config.N_CROMOSSOMOS, Config.GERACOES);
-    }
-
-    /**
      * Testa diferentes capacidades da mochila
      */
-    private static void testCapacities(List<Item> items, double capacidadeOriginal) {
+    private static void testCapacities(List<Item> items, double capacidadeOriginal)
+    {
         System.out.println("━".repeat(40));
 
         // Capacidades para testar (baseadas na configuração)
@@ -113,12 +94,16 @@ public class ExperimentRunner {
                 capacidadeOriginal * 2.0    // 100% maior
         };
 
-        String[] rotulos = {"50% Menor", "25% Menor", "Original", "50% Maior", "100% Maior"};
+        String[] rotulos = {"50% Menor", "25% Menor", "Original", "50% Maior",
+                "100% Maior"};
 
         for (int i = 0; i < capacidades.length; i++) {
-            List<Experiment.ExperimentResult> runs = Experiment.executeRuns(items, capacidades[i]);
-            double fitnessMedio = runs.stream().mapToDouble(r -> r.bestFitness).average().orElse(0);
-            double tempoMedio = runs.stream().mapToDouble(r -> r.executionTimeMs).average().orElse(0);
+            List<Experiment.ExperimentResult> runs = Experiment.executeRuns(items,
+                    capacidades[i]);
+            double fitnessMedio = runs.stream().mapToDouble(r ->
+                    r.bestFitness).average().orElse(0);
+            double tempoMedio = runs.stream().mapToDouble(r ->
+                    r.executionTimeMs).average().orElse(0);
 
             System.out.printf("• %-12s: Fitness=%-6.1f Tempo=%-5.1fms%n",
                     rotulos[i], fitnessMedio, tempoMedio);
@@ -132,12 +117,16 @@ public class ExperimentRunner {
         System.out.println("━".repeat(40));
 
         List<List<Item>> conjuntos = createItemSets();
-        String[] nomesConjuntos = {"Original", "Valiosos", "Pesados", "Leves-Valiosos", "Balanceados"};
+        String[] nomesConjuntos = {"Original", "Valiosos", "Pesados",
+                "Leves-Valiosos", "Balanceados"};
 
         for (int i = 0; i < conjuntos.size(); i++) {
-            List<Experiment.ExperimentResult> runs = Experiment.executeRuns(conjuntos.get(i), capacidade);
-            double fitnessMedio = runs.stream().mapToDouble(r -> r.bestFitness).average().orElse(0);
-            double tempoMedio = runs.stream().mapToDouble(r -> r.executionTimeMs).average().orElse(0);
+            List<Experiment.ExperimentResult> runs = Experiment.executeRuns
+                    (conjuntos.get(i), capacidade);
+            double fitnessMedio = runs.stream().mapToDouble(r ->
+                    r.bestFitness).average().orElse(0);
+            double tempoMedio = runs.stream().mapToDouble(r ->
+                    r.executionTimeMs).average().orElse(0);
 
             System.out.printf("• %-15s: Fitness=%-6.1f Tempo=%-5.1fms%n",
                     nomesConjuntos[i], fitnessMedio, tempoMedio);
@@ -185,19 +174,6 @@ public class ExperimentRunner {
     }
 
     /**
-     * Mostra resumo da análise
-     */
-    private static void showSummary() {
-        System.out.println("""
-            • ✅ Algoritmo converge rapidamente para soluções ótimas
-            • 📈 Capacidade maior permite soluções mais valiosas
-            • 💎 Conjuntos com itens valiosos têm fitness maior
-            • ⚡ Tempo de execução consistente
-            • 🎯 Alta confiabilidade (baixo desvio padrão)
-            """);
-    }
-
-    /**
      * Coleta dados para gráficos de capacidade
      */
     public static List<Experiment.ExperimentResult> collectCapacityData() {
@@ -228,7 +204,8 @@ public class ExperimentRunner {
         List<List<Item>> conjuntos = createItemSets();
 
         for (List<Item> conjunto : conjuntos) {
-            List<Experiment.ExperimentResult> runs = Experiment.executeRuns(conjunto, Config.PESO_MAXIMO);
+            List<Experiment.ExperimentResult> runs = Experiment.executeRuns(conjunto,
+                    Config.PESO_MAXIMO);
             if (!runs.isEmpty()) dados.add(runs.get(0));
         }
         return dados;

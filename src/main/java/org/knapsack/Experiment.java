@@ -7,14 +7,12 @@ import java.util.random.RandomGenerator;
 /**
  * Classe para executar experimentos e coletar estatísticas
  */
-public class Experiment {
-    // ⚠️ AGORA USA A CONFIGURAÇÃO ⚠️
+public class Experiment
+{
     private static final int NUM_RUNS = Config.NUM_EXECUCOES;
-    private static final RandomGenerator random = RandomGenerator.getDefault();
 
-    // ... (mantenha todas as classes internas: ExperimentResult e StatisticalSummary)
-
-    public static class ExperimentResult {
+    public static class ExperimentResult
+    {
         public final double bestFitness;
         public final double averageFitness;
         public final double worstFitness;
@@ -34,14 +32,16 @@ public class Experiment {
         }
     }
 
-    public static class StatisticalSummary {
+    public static class StatisticalSummary
+    {
         public final double mean;
         public final double standardDeviation;
         public final double min;
         public final double max;
         public final double confidenceInterval95;
 
-        public StatisticalSummary(double[] values) {
+        public StatisticalSummary(double[] values)
+        {
             this.mean = calculateMean(values);
             this.standardDeviation = calculateStandardDeviation(values, mean);
             this.min = calculateMin(values);
@@ -96,15 +96,18 @@ public class Experiment {
     /**
      * Executa múltiplas runs para um cenário específico
      */
-    public static List<ExperimentResult> executeRuns(List<Item> items, double capacity) {
+    public static List<ExperimentResult> executeRuns(List<Item> items, double capacity)
+    {
         return executeRuns(items, capacity, -1);
     }
 
-    public static List<ExperimentResult> executeRuns(List<Item> items, double capacity, double knownOptimal) {
+    public static List<ExperimentResult> executeRuns(List<Item> items, double capacity,
+                                                     double knownOptimal)
+    {
         List<ExperimentResult> results = new ArrayList<>();
 
-        for (int run = 0; run < NUM_RUNS; run++) {
-            // ⚠️ AGORA USA OS PARÂMETROS DO CONFIG ⚠️
+        for (int run = 0; run < NUM_RUNS; run++)
+        {
             GA ga = new GA(
                     Config.N_CROMOSSOMOS,
                     Config.TAXA_CROSSOVER,
@@ -119,7 +122,8 @@ public class Experiment {
             long endTime = System.nanoTime();
 
             double executionTimeMs = (endTime - startTime) / 1_000_000.0;
-            boolean foundOptimal = knownOptimal > 0 && Math.abs(best.getFitness() - knownOptimal) < 0.01;
+            boolean foundOptimal = knownOptimal > 0 && Math.abs(best.getFitness() -
+                    knownOptimal) < 0.01;
 
             // Encontrar a última geração com dados válidos
             int lastGen = ga.getConvergenceGeneration() > 0 ?
@@ -142,7 +146,8 @@ public class Experiment {
     /**
      * QUESTÃO 2: Experimento com diferentes tamanhos de mochila
      */
-    public static void runCapacityExperiments(List<Item> items, double originalCapacity) {
+    public static void runCapacityExperiments(List<Item> items, double originalCapacity)
+    {
         System.out.println("=== QUESTÃO 2: EXPERIMENTOS COM TAMANHO DA MOCHILA ===");
 
         double[] capacities = {
@@ -156,7 +161,8 @@ public class Experiment {
         String[] labels = {"50% Menor", "25% Menor", "Original", "50% Maior", "100% Maior"};
 
         for (int i = 0; i < capacities.length; i++) {
-            System.out.println("\n--- Capacidade: " + labels[i] + " (" + capacities[i] + ") ---");
+            System.out.println("\n--- Capacidade: " + labels[i] + " (" + capacities[i]
+                    + ") ---");
 
             List<ExperimentResult> results = executeRuns(items, capacities[i]);
 
@@ -190,7 +196,8 @@ public class Experiment {
     /**
      * QUESTÃO 3: Experimento com diferentes conjuntos de itens
      */
-    public static void runItemsExperiments(List<Item> originalItems, double capacity) {
+    public static void runItemsExperiments(List<Item> originalItems, double capacity)
+    {
         System.out.println("\n=== QUESTÃO 3: EXPERIMENTOS COM CONJUNTOS DE ITENS ===");
 
         // Diferentes conjuntos de itens
@@ -226,7 +233,8 @@ public class Experiment {
 
             // Média de gerações para convergência
             double avgGenerations = results.stream()
-                    .mapToInt(r -> r.convergenceGeneration > 0 ? r.convergenceGeneration : Config.GERACOES)
+                    .mapToInt(r -> r.convergenceGeneration > 0 ?
+                            r.convergenceGeneration : Config.GERACOES)
                     .average()
                     .orElse(0);
             System.out.printf("Média de gerações para convergência: %.1f%n", avgGenerations);

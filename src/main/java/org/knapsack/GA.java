@@ -8,8 +8,8 @@ import java.util.random.RandomGenerator;
 /**
  * Implementação do Algoritmo Genético para o Problema da Mochila
  */
-public class GA {
-    // Parâmetros do algoritmo
+public class GA
+{
     private int populationSize;
     private double crossoverRate;
     private double mutationRate;
@@ -17,7 +17,6 @@ public class GA {
     private int maxGenerations;
     private double convergenceThreshold;
 
-    // Estado do algoritmo
     private List<Chromosome> population;
     private List<Item> items;
     private double capacity;
@@ -43,7 +42,8 @@ public class GA {
     /**
      * Executa o algoritmo genético
      */
-    public Chromosome run(List<Item> items, double capacity) {
+    public Chromosome run(List<Item> items, double capacity)
+    {
         this.items = new ArrayList<>(items);
         this.capacity = capacity;
         this.bestFitnessHistory = new double[maxGenerations];
@@ -51,7 +51,6 @@ public class GA {
         this.worstFitnessHistory = new double[maxGenerations];
         this.convergenceGeneration = -1;
 
-        // Inicializa população
         initializePopulation();
 
         // Evolução
@@ -120,7 +119,8 @@ public class GA {
     /**
      * Operador de crossover - ponto único
      */
-    private Chromosome[] crossover(Chromosome parent1, Chromosome parent2) {
+    private Chromosome[] crossover(Chromosome parent1, Chromosome parent2)
+    {
         boolean[] genes1 = parent1.getGenes();
         boolean[] genes2 = parent2.getGenes();
         boolean[] child1 = new boolean[genes1.length];
@@ -214,30 +214,4 @@ public class GA {
     public double[] getWorstFitnessHistory() { return worstFitnessHistory; }
     public int getConvergenceGeneration() { return convergenceGeneration; }
     public int getMaxGenerations() { return maxGenerations; }
-
-    /**
-     * Método para obter detalhes da metodologia de seleção
-     */
-    public String getSelectionMethodology() {
-        return String.format("""
-           METODOLOGIA DE SELEÇÃO:
-           - Seleção por Torneio (tamanho 3)
-           - Elitismo: mantém os melhores %d indivíduos
-           - Cruzamento: ponto único com taxa de %.0f%%
-           - Mutação: bit flip com taxa de %.0f%%
-           - População: %d indivíduos
-           - Gerações máximas: %d
-           - Critério de parada: convergência ou gerações máximas
-           
-           Justificativa:
-           - Torneio preserva diversidade e pressão seletiva balanceada
-           - Elitismo garante que soluções boas não sejam perdidas
-           - Parâmetros balanceados entre exploração e exploração
-           """,
-                Config.ELITISMO,
-                Config.TAXA_CROSSOVER * 100,
-                Config.TAXA_MUTACAO * 100,
-                Config.N_CROMOSSOMOS,
-                Config.GERACOES);
-    }
 }
