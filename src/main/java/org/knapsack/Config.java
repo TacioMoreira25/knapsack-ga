@@ -15,9 +15,12 @@ public class Config {
     // Capacidade máxima da mochila
     public static final double PESO_MAXIMO = 100;
 
+    // Ótimo conhecido para o conjunto de itens e capacidade definidos
+    public static final double KNOWN_OPTIMAL = 830.0;
+
     // Parâmetros do algoritmo genético
     public static final int N_CROMOSSOMOS = 150;
-    public static final int GERACOES = 10000;
+    public static final int GERACOES = 100;
     public static final double TAXA_CROSSOVER = 0.85;
     public static final double TAXA_MUTACAO = 0.03;
     public static final int ELITISMO = 3;

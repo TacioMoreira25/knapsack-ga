@@ -3,7 +3,6 @@ package org.knapsack;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartFrame;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
@@ -24,7 +23,13 @@ public class Charts {
         double[] historicoMelhor = ga.getBestFitnessHistory();
         double[] historicoMedio = ga.getAverageFitnessHistory();
 
-        for (int i = 0; i < historicoMelhor.length; i++) {
+        // Garante que só plote gerações que realmente rodaram
+        int lastGen = ga.getConvergenceGeneration() > 0 ?
+                ga.getConvergenceGeneration() : historicoMelhor.length;
+        lastGen = Math.min(lastGen, historicoMelhor.length);
+
+
+        for (int i = 0; i < lastGen; i++) {
             if (historicoMelhor[i] > 0) {
                 melhor.add(i, historicoMelhor[i]);
                 medio.add(i, historicoMedio[i]);
@@ -45,17 +50,18 @@ public class Charts {
     }
 
     public static void gerarGraficoTempoCapacidade(List<Experiment.ExperimentResult> dados) {
-        System.out.println("⏱️  Gerando gráfico de Tempo vs Capacidade...");
+        System.out.println("⏱️  Gerando gráfico de Tempo (Médio) vs Capacidade...");
 
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
         String[] capacidades = {"50% Menor", "25% Menor", "Original", "50% Maior", "100% Maior"};
 
-        for (int i = 0; i < dados.size(); i++) {
+        // 'dados' agora contém os resultados médios (5 itens)
+        for (int i = 0; i < dados.size() && i < capacidades.length; i++) {
             dataset.addValue(dados.get(i).executionTimeMs, "Tempo (ms)", capacidades[i]);
         }
 
         JFreeChart chart = ChartFactory.createBarChart(
-                "Tempo de Execução vs Capacidade",
+                "Tempo de Execução (Média) vs Capacidade",
                 "Capacidade", "Tempo (ms)", dataset
         );
 
@@ -63,17 +69,18 @@ public class Charts {
     }
 
     public static void gerarGraficoFitnessCapacidade(List<Experiment.ExperimentResult> dados) {
-        System.out.println("💰 Gerando gráfico de Fitness vs Capacidade...");
+        System.out.println("💰 Gerando gráfico de Fitness (Médio) vs Capacidade...");
 
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
         String[] capacidades = {"50% Menor", "25% Menor", "Original", "50% Maior", "100% Maior"};
 
-        for (int i = 0; i < dados.size(); i++) {
+        // 'dados' agora contém os resultados médios (5 itens)
+        for (int i = 0; i < dados.size() && i < capacidades.length; i++) {
             dataset.addValue(dados.get(i).bestFitness, "Fitness", capacidades[i]);
         }
 
         JFreeChart chart = ChartFactory.createBarChart(
-                "Fitness vs Capacidade da Mochila",
+                "Fitness (Média) vs Capacidade da Mochila",
                 "Capacidade", "Fitness", dataset
         );
 
@@ -81,17 +88,17 @@ public class Charts {
     }
 
     public static void gerarGraficoTempoItens(List<Experiment.ExperimentResult> dados) {
-        System.out.println("⏱️  Gerando gráfico de Tempo vs Conjuntos...");
+        System.out.println("⏱️  Gerando gráfico de Tempo (Médio) vs Conjuntos...");
 
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
         String[] conjuntos = {"Original", "Valiosos", "Pesados", "Leves-Valiosos", "Balanceados"};
 
-        for (int i = 0; i < dados.size(); i++) {
+        for (int i = 0; i < dados.size() && i < conjuntos.length; i++) {
             dataset.addValue(dados.get(i).executionTimeMs, "Tempo (ms)", conjuntos[i]);
         }
 
         JFreeChart chart = ChartFactory.createBarChart(
-                "Tempo vs Conjunto de Itens",
+                "Tempo (Média) vs Conjunto de Itens",
                 "Conjunto", "Tempo (ms)", dataset
         );
 
@@ -99,17 +106,17 @@ public class Charts {
     }
 
     public static void gerarGraficoFitnessItens(List<Experiment.ExperimentResult> dados) {
-        System.out.println("💰 Gerando gráfico de Fitness vs Conjuntos...");
+        System.out.println("💰 Gerando gráfico de Fitness (Médio) vs Conjuntos...");
 
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
         String[] conjuntos = {"Original", "Valiosos", "Pesados", "Leves-Valiosos", "Balanceados"};
 
-        for (int i = 0; i < dados.size(); i++) {
+        for (int i = 0; i < dados.size() && i < conjuntos.length; i++) {
             dataset.addValue(dados.get(i).bestFitness, "Fitness", conjuntos[i]);
         }
 
         JFreeChart chart = ChartFactory.createBarChart(
-                "Fitness vs Conjunto de Itens",
+                "Fitness (Média) vs Conjunto de Itens",
                 "Conjunto", "Fitness", dataset
         );
 
@@ -120,17 +127,24 @@ public class Charts {
         System.out.println("🧬 Gerando gráfico de Diversidade Genética...");
 
         XYSeries diversidade = new XYSeries("Diversidade");
+        double[] historicoDiversidade = ga.getDiversityHistory(); // Pega dados reais
 
-        for (int i = 0; i < 50; i++) {
-            double div = Math.max(20, 100 * Math.exp(-0.05 * i) + Math.random() * 10);
-            diversidade.add(i, div);
+        // Garante que só plote gerações que realmente rodaram
+        int lastGen = ga.getConvergenceGeneration() > 0 ?
+                ga.getConvergenceGeneration() : historicoDiversidade.length;
+        lastGen = Math.min(lastGen, historicoDiversidade.length);
+
+        for (int i = 0; i < lastGen; i++) {
+            if (historicoDiversidade[i] > 0) {
+                diversidade.add(i, historicoDiversidade[i]);
+            }
         }
 
         XYSeriesCollection dataset = new XYSeriesCollection();
         dataset.addSeries(diversidade);
 
         JFreeChart chart = ChartFactory.createXYLineChart(
-                "Diversidade Genética",
+                "Diversidade Genética (Distância de Hamming Média)",
                 "Geração", "Diversidade (%)", dataset
         );
 
@@ -143,15 +157,22 @@ public class Charts {
 
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
-        dataset.addValue(85, "Sucesso", "Cap. Pequena");
-        dataset.addValue(92, "Sucesso", "Cap. Média");
-        dataset.addValue(96, "Sucesso", "Cap. Original");
-        dataset.addValue(98, "Sucesso", "Cap. Grande");
-        dataset.addValue(94, "Sucesso", "Itens Valiosos");
-        dataset.addValue(90, "Sucesso", "Itens Balanceados");
+        String[] capLabels = {"50% Menor", "25% Menor", "Original", "50% Maior", "100% Maior"};
+        String[] itemLabels = {"Original", "Valiosos", "Pesados", "Leves-Valiosos", "Balanceados"};
+
+        // Pega a taxa de sucesso (que armazenamos no campo 'averageFitness')
+        for (int i = 0; i < capDados.size() && i < capLabels.length; i++) {
+            // Usa o rótulo "Cap." para diferenciar
+            dataset.addValue(capDados.get(i).averageFitness, "Sucesso (%)", "Cap. " + capLabels[i]);
+        }
+
+        for (int i = 0; i < itensDados.size() && i < itemLabels.length; i++) {
+            // Usa o rótulo "Itens." para diferenciar
+            dataset.addValue(itensDados.get(i).averageFitness, "Sucesso (%)", "Itens " + itemLabels[i]);
+        }
 
         JFreeChart chart = ChartFactory.createBarChart(
-                "Taxa de Sucesso por Cenário",
+                "Taxa de Sucesso por Cenário (vs Ótimo de 805.0)",
                 "Cenário", "Sucesso (%)", dataset
         );
 
@@ -178,6 +199,7 @@ public class Charts {
         frame.pack();
         frame.setVisible(true);
 
-        try { Thread.sleep(500); } catch (InterruptedException e) {}
+        // Um pequeno delay para ajudar as janelas a se organizarem
+        try { Thread.sleep(100); } catch (InterruptedException e) {}
     }
 }

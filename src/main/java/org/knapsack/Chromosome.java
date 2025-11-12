@@ -49,12 +49,16 @@ public class Chromosome
             }
         }
 
-        // Penaliza soluções que excedem a capacidade, mas não zera completamente
+        // Penaliza soluções que excedem a capacidade
         if (totalWeight > capacity) {
-            // Penalidade proporcional ao excesso, mas mantém algum valor
+
+            // --- ESTA É A MUDANÇA (OPÇÃO 1) ---
             double excess = totalWeight - capacity;
-            double penalty = excess / capacity; // penalidade de 0% a 100%
+            // Penalidade 5x mais forte. Se exceder 20% (0.2), a penalidade já é 100% (0.2 * 5)
+            double penalty = (excess / capacity) * 5.0;
             fitness = Math.max(0, totalValue * (1 - penalty));
+            // --- FIM DA MUDANÇA ---
+
         } else {
             fitness = totalValue;
         }
@@ -83,7 +87,7 @@ public class Chromosome
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("Fitness: %.2f, Peso: %.2f/%2f, Itens: ",
+        sb.append(String.format("Fitness: %.2f, Peso: %.2f/%.2f, Itens: ",
                 fitness, totalWeight, capacity));
 
         List<String> selectedItems = new ArrayList<>();

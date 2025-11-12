@@ -25,8 +25,9 @@ public class ExperimentRunner {
 
         // 2. ESTATÍSTICAS
         System.out.println("\n ESTATÍSTICAS (" + Config.NUM_EXECUCOES + " execuções):");
+        // --- MUDANÇA 1 ---
         List<Experiment.ExperimentResult> resultados = Experiment.executeRuns(items,
-                capacidade);
+                capacidade, Config.KNOWN_OPTIMAL);
         showStatistics(resultados);
 
         // 4. CAPACIDADES
@@ -99,7 +100,7 @@ public class ExperimentRunner {
 
         for (int i = 0; i < capacidades.length; i++) {
             List<Experiment.ExperimentResult> runs = Experiment.executeRuns(items,
-                    capacidades[i]);
+                    capacidades[i], Config.KNOWN_OPTIMAL);
             double fitnessMedio = runs.stream().mapToDouble(r ->
                     r.bestFitness).average().orElse(0);
             double tempoMedio = runs.stream().mapToDouble(r ->
@@ -120,9 +121,10 @@ public class ExperimentRunner {
         String[] nomesConjuntos = {"Original", "Valiosos", "Pesados",
                 "Leves-Valiosos", "Balanceados"};
 
-        for (int i = 0; i < conjuntos.size(); i++) {
+        for (int i = 0; i < conjuntos.size(); i++)
+        {
             List<Experiment.ExperimentResult> runs = Experiment.executeRuns
-                    (conjuntos.get(i), capacidade);
+                    (conjuntos.get(i), capacidade, Config.KNOWN_OPTIMAL);
             double fitnessMedio = runs.stream().mapToDouble(r ->
                     r.bestFitness).average().orElse(0);
             double tempoMedio = runs.stream().mapToDouble(r ->
@@ -174,13 +176,12 @@ public class ExperimentRunner {
     }
 
     /**
-     * Coleta dados para gráficos de capacidade
+     * MUDANÇA: Coleta dados para gráficos de capacidade (calcula médias)
      */
     public static List<Experiment.ExperimentResult> collectCapacityData() {
-        List<Experiment.ExperimentResult> dados = new ArrayList<>();
+        List<Experiment.ExperimentResult> dadosResumidos = new ArrayList<>();
         List<Item> items = createItemsFromConfig();
 
-        // Usa capacidades baseadas na configuração
         double[] capacidades = {
                 Config.PESO_MAXIMO * 0.5,
                 Config.PESO_MAXIMO * 0.75,
@@ -190,24 +191,72 @@ public class ExperimentRunner {
         };
 
         for (double cap : capacidades) {
-            List<Experiment.ExperimentResult> runs = Experiment.executeRuns(items, cap);
-            if (!runs.isEmpty()) dados.add(runs.get(0));
+            // Passa o KNOWN_OPTIMAL (mesmo que só seja válido para um cenário)
+            List<Experiment.ExperimentResult> runs = Experiment.executeRuns
+                    (items, cap, Config.KNOWN_OPTIMAL);
+            if (!runs.isEmpty()) {
+                // Calcula as médias e taxas para este cenário
+                dadosResumidos.add(createSummaryResult(runs));
+            }
         }
-        return dados;
+        return dadosResumidos;
     }
 
     /**
-     * Coleta dados para gráficos de itens
+     * Coleta dados para gráficos de itens (calcula médias)
      */
     public static List<Experiment.ExperimentResult> collectItemsData() {
-        List<Experiment.ExperimentResult> dados = new ArrayList<>();
+        List<Experiment.ExperimentResult> dadosResumidos = new ArrayList<>();
         List<List<Item>> conjuntos = createItemSets();
 
         for (List<Item> conjunto : conjuntos) {
+            // Passa o KNOWN_OPTIMAL (mesmo que só seja válido para um cenário)
             List<Experiment.ExperimentResult> runs = Experiment.executeRuns(conjunto,
-                    Config.PESO_MAXIMO);
-            if (!runs.isEmpty()) dados.add(runs.get(0));
+                    Config.PESO_MAXIMO, Config.KNOWN_OPTIMAL);
+            if (!runs.isEmpty()) {
+                // Calcula as médias e taxas para este cenário
+                dadosResumidos.add(createSummaryResult(runs));
+            }
         }
-        return dados;
+        return dadosResumidos;
+    }
+
+    /**
+     * NOVO: Método auxiliar para criar um resultado resumido (com médias)
+     */
+    private static Experiment.ExperimentResult createSummaryResult(List<Experiment.
+            ExperimentResult> runs)
+
+    {
+        double avgBestFitness = runs.stream()
+                .mapToDouble(r -> r.bestFitness)
+                .average().orElse(0);
+        double avgAvgFitness = runs.stream()
+                .mapToDouble(r -> r.averageFitness)
+                .average().orElse(0);
+        double avgWorstFitness = runs.stream()
+                .mapToDouble(r -> r.worstFitness)
+                .average().orElse(0);
+        double avgTime = runs.stream()
+                .mapToDouble(r -> r.executionTimeMs)
+                .average().orElse(0);
+        int avgConvGen = (int) runs.stream()
+                .mapToInt(r -> r.convergenceGeneration)
+                .average().orElse(0);
+
+        // Calcula a taxa de sucesso (0-100)
+        long successCount = runs.stream().filter(r -> r.foundOptimal).count();
+        double successRate = (double) successCount * 100.0 / runs.size();
+
+        // Hack: Armazenamos a taxa de sucesso (0-100) no campo 'averageFitness'
+        // e o 'bestFitness' e 'executionTimeMs' como as médias.
+        return new Experiment.ExperimentResult(
+                avgBestFitness,
+                successRate, // Armazena a taxa de sucesso aqui
+                avgWorstFitness,
+                avgTime,
+                avgConvGen,
+                successCount > (runs.size() / 2)
+        );
     }
 }

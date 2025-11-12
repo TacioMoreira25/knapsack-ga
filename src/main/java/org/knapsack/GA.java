@@ -26,6 +26,7 @@ public class GA
     private double[] bestFitnessHistory;
     private double[] averageFitnessHistory;
     private double[] worstFitnessHistory;
+    private double[] diversityHistory; // <-- NOVO: Histórico de diversidade
     private int convergenceGeneration;
 
     public GA(int populationSize, double crossoverRate, double mutationRate,
@@ -49,6 +50,7 @@ public class GA
         this.bestFitnessHistory = new double[maxGenerations];
         this.averageFitnessHistory = new double[maxGenerations];
         this.worstFitnessHistory = new double[maxGenerations];
+        this.diversityHistory = new double[maxGenerations]; // <-- NOVO: Inicializa array
         this.convergenceGeneration = -1;
 
         initializePopulation();
@@ -192,7 +194,46 @@ public class GA
         bestFitnessHistory[generation] = bestFitness;
         averageFitnessHistory[generation] = totalFitness / populationSize;
         worstFitnessHistory[generation] = worstFitness;
+        diversityHistory[generation] = calculateDiversity();
     }
+
+    /**
+     * Calcula a diversidade genética da população (Distância de Hamming média)
+     */
+    private double calculateDiversity() {
+        double totalDistance = 0;
+        int comparisons = 0;
+
+        // Compara cada cromossomo com todos os outros
+        for (int i = 0; i < population.size(); i++) {
+            for (int j = i + 1; j < population.size(); j++) {
+                totalDistance += hammingDistance(population.get(i), population.get(j));
+                comparisons++;
+            }
+        }
+
+        if (comparisons == 0) return 0;
+
+        // Retorna a distância média percentual
+        double averageDistance = totalDistance / comparisons;
+        return (averageDistance / items.size()) * 100.0;
+    }
+
+    /**
+     * Calcula a Distância de Hamming entre dois cromossomos
+     */
+    private double hammingDistance(Chromosome c1, Chromosome c2) {
+        double distance = 0;
+        boolean[] genes1 = c1.getGenes();
+        boolean[] genes2 = c2.getGenes();
+        for (int i = 0; i < genes1.length; i++) {
+            if (genes1[i] != genes2[i]) {
+                distance++;
+            }
+        }
+        return distance;
+    }
+
 
     private boolean checkConvergence(int generation) {
         if (generation < 10) return false;
@@ -212,6 +253,7 @@ public class GA
     public double[] getBestFitnessHistory() { return bestFitnessHistory; }
     public double[] getAverageFitnessHistory() { return averageFitnessHistory; }
     public double[] getWorstFitnessHistory() { return worstFitnessHistory; }
+    public double[] getDiversityHistory() { return diversityHistory; } // <-- NOVO: Getter
     public int getConvergenceGeneration() { return convergenceGeneration; }
     public int getMaxGenerations() { return maxGenerations; }
 }

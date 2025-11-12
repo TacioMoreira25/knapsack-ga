@@ -9,37 +9,32 @@ public class Main
 
     public static void main(String[] args)
     {
-        // Mostrar cabeçalho
         showHeader();
-
-        // Executar todos os experimentos
         GA ga = ExperimentRunner.runAllExperiments();
-
-        // Mostrar menu de gráficos
         showGraphicsMenu(ga);
-
         scanner.close();
     }
 
     private static void showHeader() {
-        System.out.println("\n" + "⭐".repeat(60));
-        System.out.println("           PROBLEMA DA MOCHILA - ALGORITMO GENÉTICO");
-        System.out.println("⭐".repeat(60));
+        System.out.println("\n╔════════════════════════════════════════════════════════╗");
+        System.out.println("║     PROBLEMA DA MOCHILA - ALGORITMO GENÉTICO         ║");
+        System.out.println("╚════════════════════════════════════════════════════════╝");
 
-        // Mostra configurações atuais
-        System.out.println("\n CONFIGURAÇÃO ATUAL:");
-        System.out.println("• Itens: " + Config.PESOS_E_VALORES.length + " itens");
-        System.out.println("• Peso máximo: " + Config.PESO_MAXIMO);
-        System.out.println("• População: " + Config.N_CROMOSSOMOS + " cromossomos");
-        System.out.println("• Gerações: " + Config.GERACOES);
+        System.out.println("\n┌─ Configuração");
+        System.out.println("├─ Itens........: " + Config.PESOS_E_VALORES.length);
+        System.out.println("├─ Capacidade...: " + Config.PESO_MAXIMO + "kg");
+        System.out.println("├─ População....: " + Config.N_CROMOSSOMOS);
+        System.out.println("├─ Gerações.....: " + Config.GERACOES);
+        System.out.println("├─ Crossover....: " + (Config.TAXA_CROSSOVER * 100) + "%");
+        System.out.println("├─ Mutação......: " + (Config.TAXA_MUTACAO * 100) + "%");
+        System.out.println("└─ Elitismo.....: " + Config.ELITISMO);
     }
 
     private static void showGraphicsMenu(GA ga) {
-        System.out.println("\n" + "=".repeat(60));
-        System.out.println(" MENU DE GRÁFICOS");
-        System.out.println("=".repeat(60));
+        System.out.println("\n╔════════════════════════════════════════════════════════╗");
+        System.out.println("║                MENU DE GRÁFICOS                      ║");
+        System.out.println("╚════════════════════════════════════════════════════════╝");
 
-        // Coletar dados para gráficos
         List<Experiment.ExperimentResult> dadosCapacidade =
                 ExperimentRunner.collectCapacityData();
         List<Experiment.ExperimentResult> dadosItens =
@@ -47,19 +42,20 @@ public class Main
 
         int opcao;
         do {
-            System.out.println("\n ESCOLHA O GRÁFICO:");
-            System.out.println("━".repeat(40));
-            System.out.println("1.  Evolução do Fitness");
-            System.out.println("2.  Tempo vs Capacidade");
-            System.out.println("3.  Fitness vs Capacidade");
-            System.out.println("4.  Tempo vs Conjuntos");
-            System.out.println("5.  Fitness vs Conjuntos");
-            System.out.println("6.  Diversidade Genética");
-            System.out.println("7.  Taxa de Sucesso");
-            System.out.println("8.  TODOS os Gráficos");
-            System.out.println("0.  Finalizar");
+            System.out.println("\n┌─ Escolha uma opção:");
+            System.out.println("│");
+            System.out.println("├─ [1] Evolução do Fitness");
+            System.out.println("├─ [2] Tempo vs Capacidade");
+            System.out.println("├─ [3] Fitness vs Capacidade");
+            System.out.println("├─ [4] Tempo vs Conjuntos de Itens");
+            System.out.println("├─ [5] Fitness vs Conjuntos de Itens");
+            System.out.println("├─ [6] Diversidade Genética");
+            System.out.println("├─ [7] Taxa de Sucesso");
+            System.out.println("├─ [8] TODOS os Gráficos");
+            System.out.println("│");
+            System.out.println("└─ [0] Sair");
 
-            System.out.print("\nDigite sua escolha (0-8): ");
+            System.out.print("\n→ Opção: ");
             opcao = scanner.nextInt();
 
             switch (opcao) {
@@ -71,8 +67,8 @@ public class Main
                 case 6 -> Charts.gerarGraficoDiversidade(ga);
                 case 7 -> Charts.gerarGraficoTaxaSucesso(dadosCapacidade, dadosItens);
                 case 8 -> Charts.gerarTodosGraficos(ga, dadosCapacidade, dadosItens);
-                case 0 -> System.out.println("\n Análise concluída!");
-                default -> System.out.println(" Opção inválida!");
+                case 0 -> System.out.println("\n✓ Finalizado!");
+                default -> System.out.println("\n✗ Opção inválida!");
             }
         } while (opcao != 0);
     }

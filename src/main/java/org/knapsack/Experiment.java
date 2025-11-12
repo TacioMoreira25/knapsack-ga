@@ -2,7 +2,6 @@ package org.knapsack;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.random.RandomGenerator;
 
 /**
  * Classe para executar experimentos e coletar estatísticas
@@ -122,8 +121,10 @@ public class Experiment
             long endTime = System.nanoTime();
 
             double executionTimeMs = (endTime - startTime) / 1_000_000.0;
-            boolean foundOptimal = knownOptimal > 0 && Math.abs(best.getFitness() -
-                    knownOptimal) < 0.01;
+
+            // Compara o melhor fitness (arredondado) com o ótimo conhecido
+            boolean foundOptimal = knownOptimal > 0 &&
+                    (Math.abs(best.getFitness() - knownOptimal) < 0.01);
 
             // Encontrar a última geração com dados válidos
             int lastGen = ga.getConvergenceGeneration() > 0 ?
