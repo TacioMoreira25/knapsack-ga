@@ -49,11 +49,13 @@ public class Charts {
         mostrarGrafico(chart, "Evolução do Fitness");
     }
 
-    public static void gerarGraficoTempoCapacidade(List<Experiment.ExperimentResult> dados) {
-        System.out.println("⏱️  Gerando gráfico de Tempo (Médio) vs Capacidade...");
+    public static void gerarGraficoTempoCapacidade(List<Experiment.ExperimentResult> dados)
+    {
+        System.out.println("  Gerando gráfico de Tempo (Médio) vs Capacidade...");
 
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        String[] capacidades = {"50% Menor", "25% Menor", "Original", "50% Maior", "100% Maior"};
+        String[] capacidades = {"50% Menor", "25% Menor", "Original", "50% Maior",
+                "100% Maior"};
 
         // 'dados' agora contém os resultados médios (5 itens)
         for (int i = 0; i < dados.size() && i < capacidades.length; i++) {
@@ -69,12 +71,12 @@ public class Charts {
     }
 
     public static void gerarGraficoFitnessCapacidade(List<Experiment.ExperimentResult> dados) {
-        System.out.println("💰 Gerando gráfico de Fitness (Médio) vs Capacidade...");
+        System.out.println(" Gerando gráfico de Fitness (Médio) vs Capacidade...");
 
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        String[] capacidades = {"50% Menor", "25% Menor", "Original", "50% Maior", "100% Maior"};
+        String[] capacidades = {"50% Menor", "25% Menor", "Original", "50% Maior",
+                "100% Maior"};
 
-        // 'dados' agora contém os resultados médios (5 itens)
         for (int i = 0; i < dados.size() && i < capacidades.length; i++) {
             dataset.addValue(dados.get(i).bestFitness, "Fitness", capacidades[i]);
         }
@@ -88,10 +90,11 @@ public class Charts {
     }
 
     public static void gerarGraficoTempoItens(List<Experiment.ExperimentResult> dados) {
-        System.out.println("⏱️  Gerando gráfico de Tempo (Médio) vs Conjuntos...");
+        System.out.println(" Gerando gráfico de Tempo (Médio) vs Conjuntos...");
 
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        String[] conjuntos = {"Original", "Valiosos", "Pesados", "Leves-Valiosos", "Balanceados"};
+        String[] conjuntos = {"Original", "Valiosos", "Pesados", "Leves-Valiosos",
+                "Balanceados"};
 
         for (int i = 0; i < dados.size() && i < conjuntos.length; i++) {
             dataset.addValue(dados.get(i).executionTimeMs, "Tempo (ms)", conjuntos[i]);
@@ -106,10 +109,11 @@ public class Charts {
     }
 
     public static void gerarGraficoFitnessItens(List<Experiment.ExperimentResult> dados) {
-        System.out.println("💰 Gerando gráfico de Fitness (Médio) vs Conjuntos...");
+        System.out.println(" Gerando gráfico de Fitness (Médio) vs Conjuntos...");
 
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        String[] conjuntos = {"Original", "Valiosos", "Pesados", "Leves-Valiosos", "Balanceados"};
+        String[] conjuntos = {"Original", "Valiosos", "Pesados", "Leves-Valiosos",
+                "Balanceados"};
 
         for (int i = 0; i < dados.size() && i < conjuntos.length; i++) {
             dataset.addValue(dados.get(i).bestFitness, "Fitness", conjuntos[i]);
@@ -124,7 +128,7 @@ public class Charts {
     }
 
     public static void gerarGraficoDiversidade(GA ga) {
-        System.out.println("🧬 Gerando gráfico de Diversidade Genética...");
+        System.out.println(" Gerando gráfico de Diversidade Genética...");
 
         XYSeries diversidade = new XYSeries("Diversidade");
         double[] historicoDiversidade = ga.getDiversityHistory(); // Pega dados reais
@@ -153,14 +157,15 @@ public class Charts {
 
     public static void gerarGraficoTaxaSucesso(List<Experiment.ExperimentResult> capDados,
                                                List<Experiment.ExperimentResult> itensDados) {
-        System.out.println("✅ Gerando gráfico de Taxa de Sucesso...");
+        System.out.println(" Gerando gráfico de Taxa de Sucesso...");
 
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
-        String[] capLabels = {"50% Menor", "25% Menor", "Original", "50% Maior", "100% Maior"};
-        String[] itemLabels = {"Original", "Valiosos", "Pesados", "Leves-Valiosos", "Balanceados"};
+        String[] capLabels = {"50% Menor", "25% Menor", "Original", "50% Maior",
+                "100% Maior"};
+        String[] itemLabels = {"Original", "Valiosos", "Pesados", "Leves-Valiosos",
+                "Balanceados"};
 
-        // Pega a taxa de sucesso (que armazenamos no campo 'averageFitness')
         for (int i = 0; i < capDados.size() && i < capLabels.length; i++) {
             // Usa o rótulo "Cap." para diferenciar
             dataset.addValue(capDados.get(i).averageFitness, "Sucesso (%)", "Cap. " + capLabels[i]);
@@ -180,8 +185,9 @@ public class Charts {
     }
 
     public static void gerarTodosGraficos(GA ga, List<Experiment.ExperimentResult> capDados,
-                                          List<Experiment.ExperimentResult> itensDados) {
-        System.out.println("🎯 Gerando TODOS os gráficos...");
+                                          List<Experiment.ExperimentResult> itensDados)
+    {
+        System.out.println(" Gerando TODOS os gráficos...");
 
         gerarGraficoEvolucaoFitness(ga);
         gerarGraficoTempoCapacidade(capDados);
@@ -191,10 +197,11 @@ public class Charts {
         gerarGraficoDiversidade(ga);
         gerarGraficoTaxaSucesso(capDados, itensDados);
 
-        System.out.println("✅ Todos os gráficos gerados!");
+        System.out.println(" Todos os gráficos gerados!");
     }
 
-    private static void mostrarGrafico(JFreeChart chart, String titulo) {
+    private static void mostrarGrafico(JFreeChart chart, String titulo)
+    {
         ChartFrame frame = new ChartFrame(titulo, chart);
         frame.pack();
         frame.setVisible(true);
