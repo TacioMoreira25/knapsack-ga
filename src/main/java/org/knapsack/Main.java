@@ -17,7 +17,7 @@ public class Main
 
     private static void showHeader() {
         System.out.println("\n╔════════════════════════════════════════════════════════╗");
-        System.out.println("║     PROBLEMA DA MOCHILA - ALGORITMO GENÉTICO         ║");
+        System.out.println("║     PROBLEMA DA MOCHILA - ALGORITMO GENÉTICO           ║");
         System.out.println("╚════════════════════════════════════════════════════════╝");
 
         System.out.println("\n┌─ Configuração");
@@ -32,7 +32,7 @@ public class Main
 
     private static void showGraphicsMenu(GA ga) {
         System.out.println("\n╔════════════════════════════════════════════════════════╗");
-        System.out.println("║                MENU DE GRÁFICOS                      ║");
+        System.out.println("║                MENU DE GRÁFICOS                        ║");
         System.out.println("╚════════════════════════════════════════════════════════╝");
 
         List<Experiment.ExperimentResult> dadosCapacidade =
