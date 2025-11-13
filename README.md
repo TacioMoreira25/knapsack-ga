@@ -59,7 +59,7 @@ O projeto utiliza um Maven Wrapper (`mvnw`), que baixa e utiliza a versão corre
     *No Linux/macOS:*
 
     ```sh
-    ./mvnw clean compile exec:java
+    ./mvnw clean compile exec:java -Dexec.mainClass=org.knapsack.Main
     ```
 
     *No Windows (CMD/PowerShell):*
