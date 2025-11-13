@@ -1,8 +1,5 @@
 package org.knapsack;
 
-/**
- * Representa um item que pode ser colocado na mochila
- */
 public class Item
 {
     private final String name;

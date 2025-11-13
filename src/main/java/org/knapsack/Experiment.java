@@ -3,9 +3,6 @@ package org.knapsack;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Classe para executar experimentos e coletar estatísticas
- */
 public class Experiment
 {
     private static final int NUM_RUNS = Config.NUM_EXECUCOES;
@@ -92,9 +89,6 @@ public class Experiment
         }
     }
 
-    /**
-     * Executa múltiplas runs para um cenário específico
-     */
     public static List<ExperimentResult> executeRuns(List<Item> items, double capacity)
     {
         return executeRuns(items, capacity, -1);
@@ -122,11 +116,9 @@ public class Experiment
 
             double executionTimeMs = (endTime - startTime) / 1_000_000.0;
 
-            // Compara o melhor fitness (arredondado) com o ótimo conhecido
             boolean foundOptimal = knownOptimal > 0 &&
                     (Math.abs(best.getFitness() - knownOptimal) < 0.01);
 
-            // Encontrar a última geração com dados válidos
             int lastGen = ga.getConvergenceGeneration() > 0 ?
                     ga.getConvergenceGeneration() : ga.getMaxGenerations() - 1;
             lastGen = Math.min(lastGen, ga.getMaxGenerations() - 1);

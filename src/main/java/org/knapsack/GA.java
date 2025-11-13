@@ -5,9 +5,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.random.RandomGenerator;
 
-/**
- * Implementação do Algoritmo Genético para o Problema da Mochila
- */
 public class GA
 {
     private int populationSize;
@@ -22,11 +19,10 @@ public class GA
     private double capacity;
     private RandomGenerator random;
 
-    // Estatísticas
     private double[] bestFitnessHistory;
     private double[] averageFitnessHistory;
     private double[] worstFitnessHistory;
-    private double[] diversityHistory; // <-- NOVO: Histórico de diversidade
+    private double[] diversityHistory; 
     private int convergenceGeneration;
 
     public GA(int populationSize, double crossoverRate, double mutationRate,
@@ -40,9 +36,6 @@ public class GA
         this.random = RandomGenerator.getDefault();
     }
 
-    /**
-     * Executa o algoritmo genético
-     */
     public Chromosome run(List<Item> items, double capacity)
     {
         this.items = new ArrayList<>(items);
@@ -50,31 +43,25 @@ public class GA
         this.bestFitnessHistory = new double[maxGenerations];
         this.averageFitnessHistory = new double[maxGenerations];
         this.worstFitnessHistory = new double[maxGenerations];
-        this.diversityHistory = new double[maxGenerations]; // <-- NOVO: Inicializa array
+        this.diversityHistory = new double[maxGenerations];
         this.convergenceGeneration = -1;
 
         initializePopulation();
 
-        // Evolução
+    
         for (int generation = 0; generation < maxGenerations; generation++) {
-            // Avalia população
             evaluatePopulation(generation);
 
-            // Verifica convergência
             if (checkConvergence(generation)) {
                 convergenceGeneration = generation;
                 break;
             }
 
-            // Cria nova população
             List<Chromosome> newPopulation = new ArrayList<>();
 
-            // Elitismo: mantém os melhores indivíduos
             applyElitism(newPopulation);
 
-            // Preenche o restante da população
             while (newPopulation.size() < populationSize) {
-                // Seleção por torneio
                 Chromosome parent1 = tournamentSelection(3);
                 Chromosome parent2 = tournamentSelection(3);
 
@@ -84,8 +71,6 @@ public class GA
                 } else {
                     offspring = new Chromosome[]{parent1, parent2};
                 }
-
-                // Mutação
                 for (Chromosome child : offspring) {
                     mutate(child);
                     child.calculateFitness();
@@ -98,13 +83,9 @@ public class GA
             population = newPopulation;
         }
 
-        // Retorna a melhor solução encontrada
         return getBestChromosome();
     }
 
-    /**
-     * QUESTÃO 1: Metodologia de seleção - Implementação por Torneio
-     */
     private Chromosome tournamentSelection(int tournamentSize) {
         Chromosome best = null;
 
@@ -118,9 +99,6 @@ public class GA
         return best;
     }
 
-    /**
-     * Operador de crossover - ponto único
-     */
     private Chromosome[] crossover(Chromosome parent1, Chromosome parent2)
     {
         boolean[] genes1 = parent1.getGenes();
@@ -146,9 +124,6 @@ public class GA
         };
     }
 
-    /**
-     * Operador de mutação - bit flip
-     */
     private void mutate(Chromosome chromosome) {
         boolean[] genes = chromosome.getGenes();
 
@@ -159,9 +134,6 @@ public class GA
         }
     }
 
-    /**
-     * Aplica elitismo - mantém os melhores indivíduos
-     */
     private void applyElitism(List<Chromosome> newPopulation) {
         population.sort(Comparator.comparingDouble(Chromosome::getFitness).reversed());
 
@@ -196,15 +168,11 @@ public class GA
         worstFitnessHistory[generation] = worstFitness;
         diversityHistory[generation] = calculateDiversity();
     }
-
-    /**
-     * Calcula a diversidade genética da população (Distância de Hamming média)
-     */
+    
     private double calculateDiversity() {
         double totalDistance = 0;
         int comparisons = 0;
 
-        // Compara cada cromossomo com todos os outros
         for (int i = 0; i < population.size(); i++) {
             for (int j = i + 1; j < population.size(); j++) {
                 totalDistance += hammingDistance(population.get(i), population.get(j));
@@ -213,15 +181,11 @@ public class GA
         }
 
         if (comparisons == 0) return 0;
-
-        // Retorna a distância média percentual
+        
         double averageDistance = totalDistance / comparisons;
         return (averageDistance / items.size()) * 100.0;
     }
 
-    /**
-     * Calcula a Distância de Hamming entre dois cromossomos
-     */
     private double hammingDistance(Chromosome c1, Chromosome c2) {
         double distance = 0;
         boolean[] genes1 = c1.getGenes();
@@ -238,7 +202,6 @@ public class GA
     private boolean checkConvergence(int generation) {
         if (generation < 10) return false;
 
-        // Verifica se houve pouca melhoria nas últimas 10 gerações
         double improvement = bestFitnessHistory[generation] - bestFitnessHistory[generation - 10];
         return improvement < convergenceThreshold;
     }
@@ -248,12 +211,11 @@ public class GA
                 .max(Comparator.comparingDouble(Chromosome::getFitness))
                 .orElse(population.get(0));
     }
-
-    // Getters para estatísticas
+    
     public double[] getBestFitnessHistory() { return bestFitnessHistory; }
     public double[] getAverageFitnessHistory() { return averageFitnessHistory; }
     public double[] getWorstFitnessHistory() { return worstFitnessHistory; }
-    public double[] getDiversityHistory() { return diversityHistory; } // <-- NOVO: Getter
+    public double[] getDiversityHistory() { return diversityHistory; } 
     public int getConvergenceGeneration() { return convergenceGeneration; }
     public int getMaxGenerations() { return maxGenerations; }
 }

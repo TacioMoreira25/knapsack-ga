@@ -3,47 +3,34 @@ package org.knapsack;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Classe responsável por executar todos os experimentos
- */
 public class ExperimentRunner {
 
     public static GA runAllExperiments() {
-        System.out.println("\n🔍 EXECUTANDO EXPERIMENTOS...");
+        System.out.println("\n EXECUTANDO EXPERIMENTOS...");
         System.out.println("━".repeat(50));
 
-        // Carrega configurações
         List<Item> items = createItemsFromConfig();
         double capacidade = Config.PESO_MAXIMO;
 
-        // 1. SOLUÇÃO INICIAL
         System.out.println("\n SOLUÇÃO ENCONTRADA:");
         GA ga = new GA(Config.N_CROMOSSOMOS, Config.TAXA_CROSSOVER, Config.TAXA_MUTACAO,
                 Config.ELITISMO, Config.GERACOES, 0.001);
         Chromosome melhorSolucao = ga.run(items, capacidade);
         System.out.println(melhorSolucao);
 
-        // 2. ESTATÍSTICAS
         System.out.println("\n ESTATÍSTICAS (" + Config.NUM_EXECUCOES + " execuções):");
-        // --- MUDANÇA 1 ---
         List<Experiment.ExperimentResult> resultados = Experiment.executeRuns(items,
                 capacidade, Config.KNOWN_OPTIMAL);
         showStatistics(resultados);
 
-        // 4. CAPACIDADES
         System.out.println("\n COMPORTAMENTO COM DIFERENTES CAPACIDADES:");
         testCapacities(items, capacidade);
 
-        // 5. CONJUNTOS DE ITENS
         System.out.println("\n COMPORTAMENTO COM DIFERENTES CONJUNTOS:");
         testItemSets(capacidade);
 
         return ga;
     }
-
-    /**
-     * Cria itens a partir da configuração
-     */
     public static List<Item> createItemsFromConfig() {
         List<Item> items = new ArrayList<>();
         for (int i = 0; i < Config.PESOS_E_VALORES.length; i++) {
@@ -54,9 +41,6 @@ public class ExperimentRunner {
         return items;
     }
 
-    /**
-     * Mostra estatísticas dos resultados
-     */
     private static void showStatistics(List<Experiment.ExperimentResult> resultados)
     {
         double[] fitnessValues = new double[resultados.size()];
@@ -79,20 +63,16 @@ public class ExperimentRunner {
             """, stats.mean, stats.standardDeviation, stats.min, stats.max, tempoMedio);
     }
 
-    /**
-     * Testa diferentes capacidades da mochila
-     */
     private static void testCapacities(List<Item> items, double capacidadeOriginal)
     {
         System.out.println("━".repeat(40));
 
-        // Capacidades para testar (baseadas na configuração)
         double[] capacidades = {
-                capacidadeOriginal * 0.5,   // 50% menor
-                capacidadeOriginal * 0.75,  // 25% menor
-                capacidadeOriginal,         // original
-                capacidadeOriginal * 1.5,   // 50% maior
-                capacidadeOriginal * 2.0    // 100% maior
+                capacidadeOriginal * 0.5,
+                capacidadeOriginal * 0.75,
+                capacidadeOriginal,
+                capacidadeOriginal * 1.5,
+                capacidadeOriginal * 2.0
         };
 
         String[] rotulos = {"50% Menor", "25% Menor", "Original", "50% Maior",
@@ -111,9 +91,6 @@ public class ExperimentRunner {
         }
     }
 
-    /**
-     * Testa diferentes conjuntos de itens
-     */
     private static void testItemSets(double capacidade) {
         System.out.println("━".repeat(40));
 
@@ -135,35 +112,27 @@ public class ExperimentRunner {
         }
     }
 
-    /**
-     * Cria diferentes conjuntos de itens para teste
-     */
     public static List<List<Item>> createItemSets() {
         List<Item> itensOriginais = createItemsFromConfig();
         List<List<Item>> conjuntos = new ArrayList<>();
 
-        // 1. Original (da configuração)
         conjuntos.add(itensOriginais);
 
-        // 2. Valiosos (adiciona itens valiosos)
         List<Item> valiosos = new ArrayList<>(itensOriginais);
         valiosos.add(new Item("Diamante", 2, 500));
         valiosos.add(new Item("Ouro", 3, 400));
         conjuntos.add(valiosos);
 
-        // 3. Pesados (adiciona itens pesados)
         List<Item> pesados = new ArrayList<>(itensOriginais);
         pesados.add(new Item("Pedra", 80, 50));
         pesados.add(new Item("Ferro", 60, 80));
         conjuntos.add(pesados);
 
-        // 4. Leves e Valiosos
         List<Item> levesValiosos = new ArrayList<>(itensOriginais);
         levesValiosos.add(new Item("Joia Rara", 1, 600));
         levesValiosos.add(new Item("Pérola", 1, 450));
         conjuntos.add(levesValiosos);
 
-        // 5. Balanceados (novo conjunto balanceado)
         List<Item> balanceados = new ArrayList<>();
         for (int i = 0; i < 15; i++) {
             double peso = 5 + (i * 3);
@@ -175,9 +144,6 @@ public class ExperimentRunner {
         return conjuntos;
     }
 
-    /**
-     * MUDANÇA: Coleta dados para gráficos de capacidade (calcula médias)
-     */
     public static List<Experiment.ExperimentResult> collectCapacityData() {
         List<Experiment.ExperimentResult> dadosResumidos = new ArrayList<>();
         List<Item> items = createItemsFromConfig();
@@ -191,48 +157,35 @@ public class ExperimentRunner {
         };
 
         for (double cap : capacidades) {
-            // Passa o KNOWN_OPTIMAL (mesmo que só seja válido para um cenário)
             List<Experiment.ExperimentResult> runs = Experiment.executeRuns
                     (items, cap, Config.KNOWN_OPTIMAL);
             if (!runs.isEmpty()) {
-                // Calcula as médias e taxas para este cenário
                 dadosResumidos.add(createSummaryResult(runs));
             }
         }
         return dadosResumidos;
     }
 
-    /**
-     * Coleta dados para gráficos de itens (calcula médias)
-     */
     public static List<Experiment.ExperimentResult> collectItemsData() {
         List<Experiment.ExperimentResult> dadosResumidos = new ArrayList<>();
         List<List<Item>> conjuntos = createItemSets();
 
         for (List<Item> conjunto : conjuntos) {
-            // Passa o KNOWN_OPTIMAL (mesmo que só seja válido para um cenário)
             List<Experiment.ExperimentResult> runs = Experiment.executeRuns(conjunto,
                     Config.PESO_MAXIMO, Config.KNOWN_OPTIMAL);
             if (!runs.isEmpty()) {
-                // Calcula as médias e taxas para este cenário
                 dadosResumidos.add(createSummaryResult(runs));
             }
         }
         return dadosResumidos;
     }
 
-    /**
-     * NOVO: Método auxiliar para criar um resultado resumido (com médias)
-     */
     private static Experiment.ExperimentResult createSummaryResult(List<Experiment.
             ExperimentResult> runs)
 
     {
         double avgBestFitness = runs.stream()
                 .mapToDouble(r -> r.bestFitness)
-                .average().orElse(0);
-        double avgAvgFitness = runs.stream()
-                .mapToDouble(r -> r.averageFitness)
                 .average().orElse(0);
         double avgWorstFitness = runs.stream()
                 .mapToDouble(r -> r.worstFitness)
@@ -244,15 +197,12 @@ public class ExperimentRunner {
                 .mapToInt(r -> r.convergenceGeneration)
                 .average().orElse(0);
 
-        // Calcula a taxa de sucesso (0-100)
         long successCount = runs.stream().filter(r -> r.foundOptimal).count();
         double successRate = (double) successCount * 100.0 / runs.size();
 
-        // Hack: Armazenamos a taxa de sucesso (0-100) no campo 'averageFitness'
-        // e o 'bestFitness' e 'executionTimeMs' como as médias.
         return new Experiment.ExperimentResult(
                 avgBestFitness,
-                successRate, // Armazena a taxa de sucesso aqui
+                successRate,
                 avgWorstFitness,
                 avgTime,
                 avgConvGen,

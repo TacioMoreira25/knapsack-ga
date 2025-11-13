@@ -4,12 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.random.RandomGenerator;
 
-/**
- * Representa um cromossomo (solução) para o problema da mochila
- */
 public class Chromosome
 {
-    private final boolean[] genes; // true = item incluído, false = excluído
+    private final boolean[] genes;
     private final List<Item> items;
     private final double capacity;
     private double fitness;
@@ -30,7 +27,6 @@ public class Chromosome
         this.fitnessCalculated = false;
     }
 
-    // Inicializa aleatoriamente
     public void initialize(RandomGenerator random) {
         for (int i = 0; i < genes.length; i++) {
             genes[i] = random.nextBoolean();
@@ -49,15 +45,10 @@ public class Chromosome
             }
         }
 
-        // Penaliza soluções que excedem a capacidade
         if (totalWeight > capacity) {
-
-            // --- ESTA É A MUDANÇA (OPÇÃO 1) ---
             double excess = totalWeight - capacity;
-            // Penalidade 5x mais forte. Se exceder 20% (0.2), a penalidade já é 100% (0.2 * 5)
             double penalty = (excess / capacity) * 5.0;
             fitness = Math.max(0, totalValue * (1 - penalty));
-            // --- FIM DA MUDANÇA ---
 
         } else {
             fitness = totalValue;
